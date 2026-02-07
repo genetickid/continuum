@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game.name }}{% endblock %}
+
+{% block content %}
+    <h1>{{ game.name }}</h1>
+    <p>Playtime: {{ game.playtime }} hours</p>
+    <img src="{{ game.get_header_image_url }}" alt="{{ game.name }} header image">
+{% endblock %}

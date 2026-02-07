@@ -5,7 +5,7 @@ from .models import Game
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('name', 'playtime_minutes', 'game_id', 'created_at', 'updated_at')
+    list_display = ('name', 'playtime', 'game_id', 'created_at', 'updated_at')
     search_fields = ('name',)
-    ordering = ('-playtime_minutes',)
+    ordering = ('-playtime',)
     readonly_fields = ('created_at', 'updated_at')

@@ -49,7 +49,7 @@ class Command(BaseCommand):
                         'name': game['name'],
                         'icon_url': f"http://media.steampowered.com/steamcommunity/public/"
                                     f"images/apps/{game['appid']}/{game.get('img_icon_url')}.jpg",
-                        'playtime_minutes': game.get('playtime_forever', 0),
+                        'playtime': game.get('playtime_forever', 0) // 60,
                         'raw_data': game,
                     }
                 )

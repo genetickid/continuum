@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from core.models import TimeStampedModel
 
@@ -7,11 +8,17 @@ class Game(TimeStampedModel):
     game_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     icon_url = models.URLField(blank=True, null=True)
-    playtime_minutes = models.IntegerField(default=0)
+    playtime = models.IntegerField(default=0)
     raw_data = models.JSONField()
 
     class Meta:
-        ordering = ['-playtime_minutes']
+        ordering = ['-playtime']
+
+    def get_absolute_url(self):
+        return reverse('games:game-detail', args=[self.pk])
+
+    def get_header_image_url(self):
+        return f'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{self.game_id}/header.jpg'
 
     def __str__(self):
-        return f"{self.name} - {self.playtime_minutes // 60} hours played"
+        return f'{self.name} - {self.playtime} hours played'

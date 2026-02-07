@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Steam Library{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for game in games %}
+            <li>
+                <img src="{{ game.icon_url }}" alt="{{ game.name }} icon" width="32" height="32">
+                <a href="{{ game.get_absolute_url }}">{{ game.name }}</a>
+                - {{ game.playtime }} hours played
+            </li>
+        {% empty %}
+            <li>No games found.</li>
+        {% endfor %}
+    </ul>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Shown games {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+{% endblock %}
