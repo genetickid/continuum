@@ -3,6 +3,16 @@
 {% block title %}Steam Library{% endblock %}
 
 {% block content %}
+    <form method="get" class="d-flex mb-4 align-items-center gap-2">
+        <input name="q" value="{{ search_query }}" class="form-control" type="search" placeholder="Search games...">
+        <select name="order_by" class="form-select">
+            <option value="playtime_desc" {% if order_by == 'playtime_desc' %}selected{% endif %}>Most Played</option>
+            <option value="playtime_asc" {% if order_by == 'playtime_asc' %}selected{% endif %}>Least Played</option>
+            <option value="name" {% if order_by == 'name' %}selected{% endif %}>Name A-Z</option>
+            <option value="last_played" {% if order_by == 'last_played' %}selected{% endif %}>Last Played</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
     <div class="row g-4">
         {% for game in games %}
             <div class="col-md-4">
@@ -25,7 +35,7 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&order_by={{ order_by }}">Previous</a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -39,7 +49,7 @@
             </li>
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&order_by={{ order_by }}">Next</a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
