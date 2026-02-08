@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.urls import reverse
 
@@ -19,6 +21,12 @@ class Game(TimeStampedModel):
 
     def get_header_image_url(self):
         return f'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{self.game_id}/header.jpg'
+
+    def get_last_played(self):
+        last_played_timestamp = self.raw_data.get('rtime_last_played')
+        if last_played_timestamp:
+            return datetime.fromtimestamp(last_played_timestamp)
+        return None
 
     def __str__(self):
         return f'{self.name} - {self.playtime} hours played'

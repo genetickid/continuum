@@ -3,24 +3,50 @@
 {% block title %}Steam Library{% endblock %}
 
 {% block content %}
-    <ul>
+    <div class="row g-4">
         {% for game in games %}
-            <li>
-                <img src="{{ game.icon_url }}" alt="{{ game.name }} icon" width="32" height="32">
-                <a href="{{ game.get_absolute_url }}">{{ game.name }}</a>
-                - {{ game.playtime }} hours played
-            </li>
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{{ game.get_header_image_url }}" class="card-img-top" alt="{{ game.name }} header image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ game.name }}</h5>
+                        <p class="card-text">{{ game.playtime }} hours played</p>
+                        <a href="{{ game.get_absolute_url }}" class="btn btn-primary">View details</a>
+                    </div>
+                </div>
+            </div>
         {% empty %}
-            <li>No games found.</li>
+            <div class="col-12">
+                <p>No games found.</p>
+            </div>
         {% endfor %}
-    </ul>
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-        <span>Shown games {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next</a>
-        {% endif %}
+    </div>
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
     </div>
 {% endblock %}
