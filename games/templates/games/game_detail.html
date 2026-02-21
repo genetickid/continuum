@@ -8,7 +8,7 @@
             <div class="card-body">
                 <h2 class="card-title">{{ game.name }}</h2>
                 <p class="card-text text-muted d-flex justify-content-between">
-                    <span>{{ game.playtime }} hours played</span>
+                    <span>{{ game.playtime|floatformat:1 }} hours played</span>
                     <span>Last played: {{ game.get_last_played|date:"M d, Y" }}</span>
                 </p>
                 <hr>

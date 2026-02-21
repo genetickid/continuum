@@ -20,7 +20,7 @@
                     <img src="{{ game.get_header_image_url }}" class="card-img-top" alt="{{ game.name }} header image">
                     <div class="card-body">
                         <h5 class="card-title">{{ game.name }}</h5>
-                        <p class="card-text">{{ game.playtime }} hours played</p>
+                        <p class="card-text">{{ game.playtime|floatformat:1 }} hours played</p>
                         <a href="{{ game.get_absolute_url }}" class="btn btn-primary">View details</a>
                     </div>
                 </div>
