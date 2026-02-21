@@ -12,6 +12,7 @@
             <option value="last_played" {% if order_by == 'last_played' %}selected{% endif %}>Last Played</option>
         </select>
         <button type="submit" class="btn btn-primary">Search</button>
+        <a href="{% url 'games:dashboard' %}" class="btn btn-outline-primary">Dashboard</a>
     </form>
     <div class="row g-4">
         {% for game in games %}

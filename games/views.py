@@ -1,8 +1,11 @@
 import json
+from datetime import timedelta
 
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.db import models
+from django.utils import timezone
 
-from .models import Game
+from .models import Game, GameActivity
 from django.db.models import Q
 
 
@@ -62,5 +65,49 @@ class GameDetailView(DetailView):
 
         context['graph_dates'] = json.dumps(dates)
         context['graph_playtimes'] = json.dumps(playtimes)
+
+        return context
+
+
+class DashboardView(TemplateView):
+    template_name = 'games/dashboard.html'
+    context_object_name = 'dashboard'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        playtime_stats = GameActivity.objects.aggregate(
+            total_playtime=models.Sum('playtime')
+        )
+
+        mins_played = playtime_stats['total_playtime'] or 0.0
+
+        context['total_playtime'] = mins_played / 60
+        context['top_played'] = Game.objects.order_by('-playtime')[:5]
+
+        longest_session = GameActivity.objects.order_by('-playtime').first()
+
+        if longest_session:
+            context['longest_session'] = {
+                'game': longest_session.game,
+                'playtime': longest_session.playtime / 60
+            }
+        else:
+            context['longest_session'] = {
+                'game': 'No sessions for this time period',
+                'playtime': 0.0
+            }
+
+        avg_session = GameActivity.objects.aggregate(
+            avg_playtime=models.Avg('playtime')
+        )
+
+        mins_avg = avg_session['avg_playtime'] or 0.0
+
+        context['avg_session'] = mins_avg / 60
+
+        month_ago = timezone.now() - timedelta(days=30)
+        context['games_last_month'] = GameActivity.objects.filter(
+            created_at__gte=month_ago
+        ).values('game').distinct().count()
 
         return context
