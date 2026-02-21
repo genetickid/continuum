@@ -1,3 +1,5 @@
+import json
+
 from django.views.generic import DetailView, ListView
 
 from .models import Game
@@ -46,3 +48,19 @@ class GameDetailView(DetailView):
     model = Game
     template_name = 'games/game_detail.html'
     context_object_name = 'game'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        game_activities = self.object.history.all().order_by('created_at')
+
+        dates = []
+        playtimes = []
+
+        for activity in game_activities:
+            dates.append(activity.created_at.strftime('%m %d %Y'))
+            playtimes.append(activity.playtime)
+
+        context['graph_dates'] = json.dumps(dates)
+        context['graph_playtimes'] = json.dumps(playtimes)
+
+        return context

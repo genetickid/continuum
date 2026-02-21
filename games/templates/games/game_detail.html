@@ -29,6 +29,11 @@
                         </ul>
                     </div>
                 {% endif %}
+
+                <div class="mb-4">
+                    <canvas id="activityGraph" width="400" height="200"></canvas>
+                </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="{% url 'games:game-list' %}" class="btn btn-outline-secondary">
                         Back to games list
@@ -43,4 +48,28 @@
 
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('activityGraph').getContext('2d');
+        const graphDates = {{ graph_dates|safe }};
+        const graphPlaytimes = {{ graph_playtimes|safe }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: graphDates,
+                datasets: [{
+                    label: 'playtime (minutes)',
+                    data: graphPlaytimes,
+                    borderColor: 'rgb(11, 94, 215)',
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+        });
+    });
+</script>
 {% endblock %}

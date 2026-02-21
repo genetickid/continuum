@@ -39,8 +39,7 @@ class Command(BaseCommand):
                     GameActivity(
                         game=game,
                         playtime=session_mins,
-                        created_at=past_date,
-                        updated_at=past_date
+                        created_at=past_date
                     )
                 )
 
