@@ -13,17 +13,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='MusicTrack',
+            name='BackgroundTask',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255)),
-                ('artist', models.CharField(max_length=255)),
-                ('album', models.CharField(blank=True, max_length=255, null=True)),
-                ('spotify_id', models.CharField(db_index=True, max_length=255, unique=True)),
-                ('duration', models.IntegerField()),
-                ('raw_data', models.JSONField()),
+                ('task_id', models.CharField(max_length=255, unique=True)),
+                ('task_name', models.CharField(max_length=255)),
+                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('SUCCESS', 'Success'), ('FAILED', 'Failed')], default='PENDING', max_length=10)),
             ],
             options={
                 'ordering': ('-created_at',),

@@ -1,12 +1,19 @@
 import json
+import os
+import uuid
 from datetime import timedelta
 
-from django.views.generic import DetailView, ListView, TemplateView
 from django.db import models
+from django.db.models import Q
+from django.http import JsonResponse
 from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
+from django.views.generic import DetailView, ListView, TemplateView
+
+from core.models import BackgroundTask
 
 from .models import Game, GameActivity
-from django.db.models import Q
+from .tasks import import_steam_games
 
 
 class GameListView(ListView):
@@ -42,8 +49,21 @@ class GameListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['active_task_id'] = ""
+
+        if self.request.user.is_authenticated:
+            active_task = self.request.user.background_tasks.filter(
+                task_name='STEAM_GAMES_IMPORT',
+                status=BackgroundTask.Status.PENDING
+            ).first()
+
+            if active_task:
+                context['active_task_id'] = active_task.task_id
+
         context['search_query'] = self.request.GET.get('q', '')
         context['order_by'] = self.request.GET.get('order_by', 'playtime_desc')
+
         return context
 
 
@@ -111,3 +131,50 @@ class DashboardView(TemplateView):
         ).values('game').distinct().count()
 
         return context
+
+
+@require_POST
+def start_import_task_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    steam_id = os.environ.get('STEAM_ID')
+    api_key = os.environ.get('STEAM_API_KEY')
+
+    temp_task_id = str(uuid.uuid4())
+
+    db_task_record = BackgroundTask.objects.create(
+        user=request.user,
+        task_id=temp_task_id,
+        task_name='STEAM_GAMES_IMPORT',
+        status=BackgroundTask.Status.PENDING
+    )
+
+    celery_task = import_steam_games.delay(steam_id, api_key, db_task_record.id)
+
+    db_task_record.task_id = celery_task.id
+    db_task_record.save(update_fields=['task_id'])
+
+    return JsonResponse({
+        'message': 'Import task started',
+        'task_id': celery_task.id
+    })
+
+
+@require_GET
+def check_import_task_status_view(request, task_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    if not request.user.background_tasks.filter(task_id=task_id).exists():
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    celery_task = import_steam_games.AsyncResult(task_id)
+
+    result = celery_task.result if celery_task.ready() else None
+
+    return JsonResponse({
+        'task_id': celery_task.id,
+        'status': celery_task.status,
+        'result': result
+    })
