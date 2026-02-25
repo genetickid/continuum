@@ -1,5 +1,6 @@
-from datetime import timedelta
 import random
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -39,8 +40,7 @@ class Command(BaseCommand):
                     GameActivity(
                         game=game,
                         playtime=session_mins,
-                        created_at=past_date,
-                        updated_at=past_date
+                        created_at=past_date
                     )
                 )
 
