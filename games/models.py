@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from core.models import TimeStampedModel
 
+from .constants import STEAM_HEADER_IMAGE_BASE_URL
 
-STEAM_HEADER_IMAGE_BASE_URL = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/'
 
 class Game(TimeStampedModel):
     game_id = models.CharField(max_length=255, unique=True, verbose_name="app ID")
